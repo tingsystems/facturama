@@ -3,7 +3,7 @@
 # (c) 2017 Raul Granados <@pollitux>
 
 import base64
-from requests import post, get, patch, put, delete
+from requests import request
 
 try:
     import json
@@ -63,23 +63,10 @@ class Facturama:
     def build_http_request(cls, method, path, payload=None):
         cls.aut_api()
         method = str(method).lower()
-        if method == 'post':
-            body = post('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
-        elif method == 'get':
-            body = get('{}{}'.format(API_BASE, path), headers=cls._headers)
-        elif method == 'patch':
-            body = patch('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
-        elif method == 'delete':
-            body = delete('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
-        elif method == 'put':
-            body = put('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
-        else:
-            raise MalformedRequestError
-
+        body = request(method, '{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
         if body.status_code == 200 or body.status_code == 201:
             response_body = body.json()
             return response_body
-
         if body.status_code == 400 or body.status_code == 400:
             raise MalformedRequestError(body.json())
         elif body.status_code == 401 or body.status_code == 401:
@@ -152,3 +139,10 @@ class Branch(Facturama):
     Opr with Branch Offices of Facturama API
     """
     base_path = 'BranchOffice'
+
+
+class Cfdi(Facturama):
+    """
+    Opr with Cfdi of Facturama API
+    """
+    base_path = 'Cfdi'
