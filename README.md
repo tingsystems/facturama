@@ -8,7 +8,7 @@ pip install -e git://github.com/tingsystems/facturama.git@0.0.2#egg=facturama
 Crete new Client
 
 
-```pyhon
+```python
 import facturama
 
 facturama._credentials = ('username', 'password')
