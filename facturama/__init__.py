@@ -44,10 +44,9 @@ class ApiError(FacturamaError): pass
 
 class Facturama:
     """
-
+    Build request facturama API
     """
 
-    base_path = None
     _headers = None
 
     @classmethod
@@ -82,67 +81,74 @@ class Facturama:
         else:
             raise FacturamaError(body.json())
 
+    def to_object(self, response):
+        for key, value in response.items():
+            setattr(self, key, value)
+        return self
+
     @classmethod
     def create(cls, data):
         """
 
-        :param data: dic with data for create object
-        :return:
+        :param data: dict with data for create object
+        :return: object with data from response
         """
-        return cls.build_http_request('post', cls.base_path, data)
+        return cls.to_object(cls, cls.build_http_request('post', cls.__name__, data))
 
     @classmethod
     def retrieve(cls, oid):
         """
 
         :param oid: id of object retrieve
-        :return:
+        :return: object with data from response
         """
-        return cls.build_http_request('get', '{}/{}'.format(cls.base_path, oid))
+        return cls.to_object(cls, cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid)))
 
     @classmethod
     def all(cls):
         """
-
-        :param id: id of object retrieve
-        :return:
+        :return: list of objects from response facturama api
         """
-        return cls.build_http_request('get', cls.base_path)
+        return cls.build_http_request('get', cls.__name__)
 
     @classmethod
     def update(cls, data, oid):
         """
 
-        :param data: dic with data for create object
+        :param data: dict with data for create object
         :param oid: id of object
-        :return:
+        :return: object with data from response
         """
-        return cls.build_http_request('put', '{}/{}'.format(cls.base_path, oid), data)
+        return cls.to_object(cls, cls.build_http_request('put', '{}/{}'.format(cls.__name__, oid), data))
+
+    @classmethod
+    def delete(cls, oid):
+        """
+        :param oid: id of object
+        :return: None
+        """
+        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid))
 
 
-class Customer(Facturama):
+class Client(Facturama):
     """
     Opr with Clients of Facturama API
     """
-    base_path = 'Client'
 
 
 class Product(Facturama):
     """
     Opr with Products of Facturama API
     """
-    base_path = 'Product'
 
 
-class Branch(Facturama):
+class BranchOffice(Facturama):
     """
     Opr with Branch Offices of Facturama API
     """
-    base_path = 'BranchOffice'
 
 
 class Cfdi(Facturama):
     """
     Opr with Cfdi of Facturama API
     """
-    base_path = 'Cfdi'
