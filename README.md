@@ -26,7 +26,7 @@ customer_object = {
     "Rfc": "GARR900630G98",
     "Name": "Pollitux"
  }
-customer = self.client.Customer.create(customer_object)
+customer = facturama.Customer.create(customer_object)
 ```
 
 
@@ -47,7 +47,7 @@ product_object = {
     "Price": 6.0
 }
 
-product = self.client.Product.create(product_object)
+product = facturama.Product.create(product_object)
 
 ```
  
@@ -74,7 +74,7 @@ branch_office_object = {
     },
 }
 
-branch = self.client.Branch.create(branch_object)
+branch = facturama.Branch.create(branch_object)
 
 ```
 
@@ -114,7 +114,7 @@ cfdi_object = {
     ]
 }
 
-cfdi = self.client.Cfdi.create(cfdi_object)
+cfdi = facturama.Cfdi.create(cfdi_object)
 
 ```
 
