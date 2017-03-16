@@ -30,7 +30,7 @@ customer_object = {
     "Rfc": "GARR900630G98",
     "Name": "Pollitux"
  }
-customer = facturama.Customer.create(customer_object)
+customer = facturama.Client.create(customer_object)
 ```
 
 
@@ -78,7 +78,7 @@ branch_office_object = {
     },
 }
 
-branch = facturama.Branch.create(branch_object)
+branch = facturama.BranchOffice.create(branch_object)
 
 ```
 
