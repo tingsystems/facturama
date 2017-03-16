@@ -18,8 +18,8 @@ class BaseEndpointTestCase(unittest.TestCase):
             "ZipCode": "59510",
             "Locality": "Xiquilpan",
             "Municipality": "Jiquilpan",
-            "State": "Mich",
-            "Country": "Mex"
+            "State": "MICHOACAN DE OCAMPO",
+            "Country": "MX"
         },
         "Rfc": "GARR900630G98",
         "Name": "Pollitux"

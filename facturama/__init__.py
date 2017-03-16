@@ -2,6 +2,7 @@
 # coding: utf-8
 # (c) 2017 Raul Granados <@pollitux>
 
+import base64
 from requests import post, get, patch, put, delete
 
 try:
@@ -12,9 +13,9 @@ except ImportError:
 __version__ = '0.0.1'
 __author__ = 'Raul Granados'
 
-_credentials = ('', '')
+API_BASE = 'https://www.api.facturama.com.mx/api/'
 
-API_BASE = 'https://www.facturama.mx/api/'
+_credentials = ('', '')
 
 
 class FacturamaError(Exception):
@@ -42,76 +43,57 @@ class ApiError(FacturamaError): pass
 
 
 class Facturama:
-    def __init__(self):
-        self._username, self._password = _credentials
-        self._headers = {'content-type': 'application/json'}
-        self.auth_api()
+    """
 
-    def auth_api(self):
-        """
-        Login in the api
-        :return:
-        """
-        payload = {
-            'username': self._username,
-            'password': self._password,
-            'grant_type': 'password'
+    """
+
+    base_path = None
+    _headers = None
+
+    @classmethod
+    def aut_api(cls):
+        _username, _password = _credentials
+        cls._headers = {
+            'Authorization': 'Basic %s' % (base64.b64encode(
+                ('{}:{}'.format(_username, _password)).encode('utf-8'))).decode('ascii'),
+            'content-type': 'application/json'
         }
 
-        body = post('{}{}'.format(API_BASE, 'LogIn'), data=json.dumps(payload))
-
-
-        if body.status_code == 400 or body.status_code == 400:
-            raise MalformedRequestError(json.loads(body))
-        elif body.status_code == 401 or body.status_code == 401:
-            raise AuthenticationError(json.loads(body))
-        elif body.status_code == 404 or body.status_code == 404:
-            raise AuthenticationError(json.loads(body))
-        print(vars(body), 'sdsdd')
-        auth = body.json()
-        self._headers = {'Authorization': 'Bearer {}'.format(auth['access_token']), 'content-type': 'application/json'}
-
-    def build_http_request(self, method, path, payload=None):
-
+    @classmethod
+    def build_http_request(cls, method, path, payload=None):
+        cls.aut_api()
         method = str(method).lower()
         if method == 'post':
-            body = post('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=self._headers)
+            body = post('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
         elif method == 'get':
-            body = get('{}{}'.format(API_BASE, path), headers=self._headers)
+            body = get('{}{}'.format(API_BASE, path), headers=cls._headers)
         elif method == 'patch':
-            body = patch('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=self._headers)
+            body = patch('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
         elif method == 'delete':
-            body = delete('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=self._headers)
+            body = delete('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
         elif method == 'put':
-            body = put('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=self._headers)
+            body = put('{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
         else:
             raise MalformedRequestError
 
-        if body.status_code == '200' or body.status_code == '201':
-            response_body = json.loads(body)
+        if body.status_code == 200 or body.status_code == 201:
+            response_body = body.json()
             return response_body
 
         if body.status_code == 400 or body.status_code == 400:
-            raise MalformedRequestError(json.loads(body))
+            raise MalformedRequestError(body.json())
         elif body.status_code == 401 or body.status_code == 401:
-            raise AuthenticationError(json.loads(body))
+            raise AuthenticationError(body.json())
         elif body.status_code == 402 or body.status_code == 402:
-            raise ProcessingError(json.loads(body))
+            raise ProcessingError(body.json())
         elif body.status_code == 404 or body.status_code == 404:
-            raise ResourceNotFoundError(json.loads(body))
+            raise ResourceNotFoundError(body.json())
         elif body.status_code == 422 or body.status_code == 422:
-            raise ParameterValidationError(json.loads(body))
+            raise ParameterValidationError(body.json())
         elif body.status_code == 500 or body.status_code == 500:
-            raise ApiError(json.loads(body))
+            raise ApiError(body.json())
         else:
-            raise FacturamaError(json.loads(body))
-
-    def send_request(self):
-        pass
-
-
-class BuildRequest(Facturama):
-    base_path = None
+            raise FacturamaError(body.json())
 
     @classmethod
     def create(cls, data):
@@ -120,50 +102,53 @@ class BuildRequest(Facturama):
         :param data: dic with data for create object
         :return:
         """
-        cls.build_http_request(cls, 'post', cls.base_path, data)
+        return cls.build_http_request('post', cls.base_path, data)
 
-    def retrieve(self, oid):
+    @classmethod
+    def retrieve(cls, oid):
         """
 
         :param oid: id of object retrieve
         :return:
         """
-        self.build_http_request(self, 'get', '{}/{}'.format(self.base_path, oid))
+        return cls.build_http_request('get', '{}/{}'.format(cls.base_path, oid))
 
-    def all(self, id):
+    @classmethod
+    def all(cls):
         """
 
         :param id: id of object retrieve
         :return:
         """
-        self.build_http_request(self, 'get', self.base_path)
+        return cls.build_http_request('get', cls.base_path)
 
-    def update(self, data, oid):
+    @classmethod
+    def update(cls, data, oid):
         """
 
         :param data: dic with data for create object
         :param oid: id of object
         :return:
         """
-        self.build_http_request(self, 'put', '{}/{}'.format(self.base_path, oid), data)
+        return cls.build_http_request('put', '{}/{}'.format(cls.base_path, oid), data)
 
 
-class Customer(BuildRequest):
+class Customer(Facturama):
     """
-
+    Opr with Clients of Facturama API
     """
     base_path = 'Client'
 
 
-class Product(BuildRequest):
+class Product(Facturama):
     """
-
+    Opr with Products of Facturama API
     """
     base_path = 'Product'
 
 
-class Branch(BuildRequest):
+class Branch(Facturama):
     """
-
+    Opr with Branch Offices of Facturama API
     """
     base_path = 'BranchOffice'
