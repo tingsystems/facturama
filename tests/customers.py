@@ -12,3 +12,8 @@ class CustomerEndpointTestCase(BaseEndpointTestCase):
         self.client._credentials = ('pruebas', 'pruebas2011')
         customer = self.client.Client.retrieve('l0jpGRDbA5zGQ7uPPwcd6A2')
         assert customer.Id
+
+    def test_customer_get_all(self):
+        self.client._credentials = ('pruebas', 'pruebas2011')
+        customer = self.client.Client.all()
+        assert customer
