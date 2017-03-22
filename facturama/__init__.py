@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '0.0.1'
+__version__ = '0.0.3'
 __author__ = 'Raul Granados'
 
 API_BASE = 'https://www.api.facturama.com.mx/api/'
@@ -59,10 +59,12 @@ class Facturama:
         }
 
     @classmethod
-    def build_http_request(cls, method, path, payload=None):
+    def build_http_request(cls, method, path, payload=None, params=None):
         cls.aut_api()
         method = str(method).lower()
-        body = request(method, '{}{}'.format(API_BASE, path), data=json.dumps(payload), headers=cls._headers)
+        body = request(
+            method, '{}{}'.format(API_BASE, path), data=json.dumps(payload), params=params, headers=cls._headers
+        )
         if body.status_code == 200 or body.status_code == 201:
             response_body = body.json()
             return response_body
@@ -96,20 +98,27 @@ class Facturama:
         return cls.to_object(cls, cls.build_http_request('post', cls.__name__, data))
 
     @classmethod
-    def retrieve(cls, oid):
+    def retrieve(cls, oid, params=None):
         """
 
         :param oid: id of object retrieve
         :return: object with data from response
         """
-        return cls.to_object(cls, cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid)))
+        return cls.to_object(cls, cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid), params=params))
 
     @classmethod
-    def all(cls):
+    def all(cls, params=None):
         """
         :return: list of objects from response facturama api
         """
-        return cls.build_http_request('get', cls.__name__)
+        return cls.build_http_request('get', cls.__name__, params=params)
+
+    @classmethod
+    def query(cls, params=None):
+        """
+        :return: list of objects from response facturama api
+        """
+        return cls.build_http_request('get', cls.__name__, params=params)
 
     @classmethod
     def update(cls, data, oid):
@@ -152,3 +161,17 @@ class Cfdi(Facturama):
     """
     Opr with Cfdi of Facturama API
     """
+
+    @classmethod
+    def get_by_file(cls, f, t, oid):
+        """
+        :return: get cfdi file by format and type
+        """
+        return cls.build_http_request('get', '{}/{}/{}/{}'.format(cls.__name__, f, t, oid))
+
+    @classmethod
+    def send_by_email(cls, t, oid, email):
+        """
+        :return: send Cfdi by email
+        """
+        return cls.build_http_request('post', '{}?cfdiType={}&cfdiId={}&email={}'.format(cls.__name__, t, oid, email))
