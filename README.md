@@ -3,7 +3,7 @@ Facturama python wrapper https://www.api.facturama.com.mx/
 
 Install
 ```sh
-pip install -e git://github.com/tingsystems/facturama.git@0.0.4#egg=facturama
+pip install -e git://github.com/tingsystems/facturama.git@1.0.0#egg=facturama
 ```
 Crete new Client
 
