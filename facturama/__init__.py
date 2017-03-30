@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -66,6 +66,8 @@ class Facturama:
         if api_lite:
             path = str(path).lower()
             api_base = 'https://www.api.facturama.com.mx/api-lite/'
+
+        print('{}{}'.format(api_base, path))
         body = request(
             method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
         )
@@ -171,6 +173,15 @@ class Cfdi(Facturama):
     """
     Opr with Cfdi of Facturama API
     """
+
+    @classmethod
+    def create(cls, data):
+        """
+
+        :param data: dict with data for create object
+        :return: object with data from response
+        """
+        return cls.to_object(cls.build_http_request('post', cls.__name__ if not api_lite else 'cfdis', data))
 
     @classmethod
     def get_by_file(cls, f, t, oid):
