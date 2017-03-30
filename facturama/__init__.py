@@ -10,15 +10,10 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '0.0.4'
+__version__ = '1.0.0'
 __author__ = 'Raul Granados'
 
-API_BASE = 'https://www.api.facturama.com.mx/api/'
-
 api_lite = False
-
-if api_lite:
-    API_BASE = 'https://www.api.facturama.com.mx/api-lite/'
 
 _credentials = ('', '')
 
@@ -65,15 +60,21 @@ class Facturama:
 
     @classmethod
     def build_http_request(cls, method, path, payload=None, params=None):
+        api_base = 'https://www.api.facturama.com.mx/api/'
         cls.aut_api()
         method = str(method).lower()
         if api_lite:
             path = str(path).lower()
+            api_base = 'https://www.api.facturama.com.mx/api-lite/'
         body = request(
-            method, '{}{}'.format(API_BASE, path), data=json.dumps(payload), params=params, headers=cls._headers
+            method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
         )
-        if body.status_code == 200 or body.status_code == 201:
-            response_body = body.json()
+        if body.status_code == 200 or body.status_code == 201 or body.status_code == 204:
+            response_body = {'status': True}
+            try:
+                response_body = body.json()
+            except Exception:
+                pass
             return response_body
         if body.status_code == 400 or body.status_code == 400:
             raise MalformedRequestError(body.json())
@@ -190,3 +191,36 @@ class csds(Facturama):
     """
     Opr with csds of Facturama API
     """
+
+    @classmethod
+    def get_by_rfc(cls, rfc):
+        """
+        get csds by rfc
+        :return: object with data from response
+        """
+        return cls.to_object(cls.build_http_request('get', '{}/{}'.format(cls.__name__, rfc)))
+
+    @classmethod
+    def create(cls, data):
+        raise NotImplemented('Method not implemented')
+
+    @classmethod
+    def upload(cls, rfc, path_key, path_cer, password):
+        """
+
+        :param rfc:
+        :param path_key:
+        :param path_cer:
+        :param password:
+        :return: object with data from response
+        """
+        with open(path_key, 'rb') as f:
+            file_key = base64.b64encode(f.read()).decode('utf-8')
+
+        with open(path_cer, 'rb') as f:
+            cer_key = base64.b64encode(f.read()).decode('utf-8')
+
+        data = {
+            'Rfc': str(rfc).upper(), 'Certificate': cer_key, 'PrivateKey': file_key, 'PrivateKeyPassword': password
+        }
+        return cls.build_http_request('post', cls.__name__, data)
