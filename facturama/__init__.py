@@ -10,10 +10,15 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 __author__ = 'Raul Granados'
 
 API_BASE = 'https://www.api.facturama.com.mx/api/'
+
+api_lite = False
+
+if api_lite:
+    API_BASE = 'https://www.api.facturama.com.mx/api-lite/'
 
 _credentials = ('', '')
 
@@ -62,6 +67,8 @@ class Facturama:
     def build_http_request(cls, method, path, payload=None, params=None):
         cls.aut_api()
         method = str(method).lower()
+        if api_lite:
+            path = str(path).lower()
         body = request(
             method, '{}{}'.format(API_BASE, path), data=json.dumps(payload), params=params, headers=cls._headers
         )
@@ -83,10 +90,11 @@ class Facturama:
         else:
             raise FacturamaError(body.json())
 
-    def to_object(self, response):
+    @classmethod
+    def to_object(cls, response):
         for key, value in response.items():
-            setattr(self, key, value)
-        return self
+            setattr(cls, key, value)
+        return cls
 
     @classmethod
     def create(cls, data):
@@ -95,20 +103,21 @@ class Facturama:
         :param data: dict with data for create object
         :return: object with data from response
         """
-        return cls.to_object(cls, cls.build_http_request('post', cls.__name__, data))
+        return cls.to_object(cls.build_http_request('post', cls.__name__, data))
 
     @classmethod
     def retrieve(cls, oid, params=None):
         """
 
-        :param oid: id of object retrieve
+        :params oid: id of object retrieve
         :return: object with data from response
         """
-        return cls.to_object(cls, cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid), params=params))
+        return cls.to_object(cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid), params=params))
 
     @classmethod
     def all(cls, params=None):
         """
+        :type params: extra params for build request
         :return: list of objects from response facturama api
         """
         return cls.build_http_request('get', cls.__name__, params=params)
@@ -116,6 +125,7 @@ class Facturama:
     @classmethod
     def query(cls, params=None):
         """
+        :type params: extra params for build request
         :return: list of objects from response facturama api
         """
         return cls.build_http_request('get', cls.__name__, params=params)
@@ -123,17 +133,16 @@ class Facturama:
     @classmethod
     def update(cls, data, oid):
         """
-
-        :param data: dict with data for create object
-        :param oid: id of object
+        :param oid: id object
+        :type data: data
         :return: object with data from response
         """
-        return cls.to_object(cls, cls.build_http_request('put', '{}/{}'.format(cls.__name__, oid), data))
+        return cls.to_object(cls.build_http_request('put', '{}/{}'.format(cls.__name__, oid), data))
 
     @classmethod
     def delete(cls, oid):
         """
-        :param oid: id of object
+        :param oid: id object
         :return: None
         """
         return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid))
@@ -175,3 +184,9 @@ class Cfdi(Facturama):
         :return: send Cfdi by email
         """
         return cls.build_http_request('post', '{}?cfdiType={}&cfdiId={}&email={}'.format(cls.__name__, t, oid, email))
+
+
+class csds(Facturama):
+    """
+    Opr with csds of Facturama API
+    """
