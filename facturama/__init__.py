@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -216,7 +216,7 @@ class csds(Facturama):
         raise NotImplemented('Method not implemented')
 
     @classmethod
-    def upload(cls, rfc, path_key, path_cer, password):
+    def upload(cls, rfc, path_key, path_cer, password, encode=False):
         """
 
         :param rfc:
@@ -225,13 +225,15 @@ class csds(Facturama):
         :param password:
         :return: object with data from response
         """
-        with open(path_key, 'rb') as f:
-            file_key = base64.b64encode(f.read()).decode('utf-8')
+        file_key, file_cer = path_key, path_cer
+        if not encode:
+            with open(path_key, 'rb') as f:
+                file_key = base64.b64encode(f.read()).decode('utf-8')
 
-        with open(path_cer, 'rb') as f:
-            cer_key = base64.b64encode(f.read()).decode('utf-8')
+            with open(path_cer, 'rb') as f:
+                file_cer = base64.b64encode(f.read()).decode('utf-8')
 
         data = {
-            'Rfc': str(rfc).upper(), 'Certificate': cer_key, 'PrivateKey': file_key, 'PrivateKeyPassword': password
+            'Rfc': str(rfc).upper(), 'Certificate': file_cer, 'PrivateKey': file_key, 'PrivateKeyPassword': password
         }
         return cls.build_http_request('post', cls.__name__, data)
