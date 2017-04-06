@@ -67,7 +67,6 @@ class Facturama:
             path = str(path).lower()
             api_base = 'https://www.api.facturama.com.mx/api-lite/'
 
-        print('{}{}'.format(api_base, path))
         body = request(
             method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
         )
