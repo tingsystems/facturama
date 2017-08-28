@@ -67,7 +67,6 @@ class Facturama:
             path = str(path).lower()
             api_base = 'https://www.api.facturama.com.mx/api-lite/'
 
-        print('{}{}'.format(api_base, path))
         body = request(
             method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
         )
@@ -78,17 +77,17 @@ class Facturama:
             except Exception:
                 pass
             return response_body
-        if body.status_code == 400 or body.status_code == 400:
+        if body.status_code == 400:
             raise MalformedRequestError(body.json())
-        elif body.status_code == 401 or body.status_code == 401:
+        elif body.status_code == 401:
             raise AuthenticationError(body.json())
-        elif body.status_code == 402 or body.status_code == 402:
+        elif body.status_code == 402:
             raise ProcessingError(body.json())
-        elif body.status_code == 404 or body.status_code == 404:
+        elif body.status_code == 404:
             raise ResourceNotFoundError(body.json())
-        elif body.status_code == 422 or body.status_code == 422:
+        elif body.status_code == 422:
             raise ParameterValidationError(body.json())
-        elif body.status_code == 500 or body.status_code == 500:
+        elif body.status_code == 500:
             raise ApiError(body.json())
         else:
             raise FacturamaError(body.json())
@@ -196,6 +195,14 @@ class Cfdi(Facturama):
         :return: send Cfdi by email
         """
         return cls.build_http_request('post', '{}?cfdiType={}&cfdiId={}&email={}'.format(cls.__name__, t, oid, email))
+
+    @classmethod
+    def delete(cls, oid):
+        """
+        :param oid: id object
+        :return: None
+        """
+        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid))
 
 
 class csds(Facturama):
