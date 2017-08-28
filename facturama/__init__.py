@@ -64,7 +64,6 @@ class Facturama:
         cls.aut_api()
         method = str(method).lower()
         if api_lite:
-            path = str(path).lower()
             api_base = 'https://www.api.facturama.com.mx/api-lite/'
 
         body = request(
