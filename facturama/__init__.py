@@ -10,10 +10,11 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 __author__ = 'Raul Granados'
 
 api_lite = False
+sandbox = False
 
 _credentials = ('', '')
 
@@ -24,22 +25,28 @@ class FacturamaError(Exception):
         self.error_json = error_json
 
 
-class MalformedRequestError(FacturamaError): pass
+class MalformedRequestError(FacturamaError):
+    pass
 
 
-class AuthenticationError(FacturamaError): pass
+class AuthenticationError(FacturamaError):
+    pass
 
 
-class ProcessingError(FacturamaError): pass
+class ProcessingError(FacturamaError):
+    pass
 
 
-class ResourceNotFoundError(FacturamaError): pass
+class ResourceNotFoundError(FacturamaError):
+    pass
 
 
-class ParameterValidationError(FacturamaError): pass
+class ParameterValidationError(FacturamaError):
+    pass
 
 
-class ApiError(FacturamaError): pass
+class ApiError(FacturamaError):
+    pass
 
 
 class Facturama:
@@ -59,12 +66,26 @@ class Facturama:
         }
 
     @classmethod
-    def build_http_request(cls, method, path, payload=None, params=None):
-        api_base = 'https://www.api.facturama.com.mx/api/'
+    def build_http_request(cls, method, path, payload=None, params=None, version=0):
+        """
+
+        :param method: get, post, patch, put
+        :param path: resource in the Facturama API
+        :param payload: request body
+        :param params: query params by url
+        :param version: cfdi version 0 api, 1 api and cfdi 3.3, 2 api-lite, 3 api-lite and cfdi 3.3
+        :return:
+        """
+        # urls base of facturama api
+        uris = [
+            'https://www.api.facturama.com.mx/api/',
+            'https://www.api.facturama.com.mx/api/2/',
+            'https://www.api.facturama.com.mx/api-lite/',
+            'https://www.api.facturama.com.mx/2/api-lite/',
+        ]
+        api_base = uris[version]
         cls.aut_api()
         method = str(method).lower()
-        if api_lite:
-            api_base = 'https://www.api.facturama.com.mx/api-lite/'
 
         body = request(
             method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
@@ -76,6 +97,7 @@ class Facturama:
             except Exception:
                 pass
             return response_body
+
         if body.status_code == 400:
             raise MalformedRequestError(body.json())
         elif body.status_code == 401:
@@ -173,13 +195,14 @@ class Cfdi(Facturama):
     """
 
     @classmethod
-    def create(cls, data):
+    def create(cls, data, v=0):
         """
 
+        :param v: cfdi version 0 api, 1 api and cfdi 3.3, 2 api-lite, 3 api-lite and cfdi 3.3
         :param data: dict with data for create object
         :return: object with data from response
         """
-        return cls.to_object(cls.build_http_request('post', cls.__name__ if not api_lite else 'cfdis', data))
+        return cls.to_object(cls.build_http_request('post', cls.__name__ if not api_lite else 'cfdis', data, version=v))
 
     @classmethod
     def get_by_file(cls, f, t, oid):
@@ -201,7 +224,10 @@ class Cfdi(Facturama):
         :param oid: id object
         :return: None
         """
-        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid))
+        v = 2 if api_lite else 0
+        return cls.build_http_request(
+            'delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid, version=v)
+        )
 
 
 class csds(Facturama):
@@ -225,6 +251,7 @@ class csds(Facturama):
     def upload(cls, rfc, path_key, path_cer, password, encode=False):
         """
 
+        :param encode:
         :param rfc:
         :param path_key:
         :param path_cer:

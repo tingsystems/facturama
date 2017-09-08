@@ -5,6 +5,10 @@ Install
 ```sh
 pip install -e git://github.com/tingsystems/facturama.git@master#egg=facturama
 ```
+
+NOTE: The Wrapper by default use api base of Facturama
+
+
 Crete new Client
 
 
@@ -78,12 +82,21 @@ branch_office_object = {
     },
 }
 
-branch = facturama.BranchOffice.create(branch_object)
+branch = facturama.BranchOffice.create(branch_office_object)
 
 ```
 
 Create new Cfdi
 
+The wrapper support the version cfids 
+
+0 api default\
+1 api and cfdi 2\
+2 api-lite\
+3 api-lite and cfdi 2\
+
+You can see https://api.facturama.com.mx/Help for more information
+ 
 ```python
 import facturama 
 
@@ -118,7 +131,8 @@ cfdi_object = {
     ]
 }
 
-cfdi = facturama.Cfdi.create(cfdi_object)
+cfdi = facturama.Cfdi.create(cfdi_object) # create cfdi version 0
+cfdi = facturama.Cfdi.create(cfdi_object, v=3) # create cfdi version 2 and api-lite 
 
 ```
 
