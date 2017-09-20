@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '1.1.0'
+__version__ = '2.0.1'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -226,7 +226,7 @@ class Cfdi(Facturama):
         """
         v = 2 if api_lite else 0
         return cls.build_http_request(
-            'delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid, version=v)
+            'delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid), version=v
         )
 
 
