@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -270,3 +270,112 @@ class csds(Facturama):
             'Rfc': str(rfc).upper(), 'Certificate': file_cer, 'PrivateKey': file_key, 'PrivateKeyPassword': password
         }
         return cls.build_http_request('post', cls.__name__, data)
+
+
+class Catalogs(Facturama):
+    catalog = None
+    prefix = 'Catalogs'
+
+    @classmethod
+    def query(cls, params=None):
+        """
+        :type params: extra params for build request
+        :return: list of objects from response facturama api
+        """
+        return cls.build_http_request('get', '{}/{}'.format(cls.prefix, cls.catalog), params=params)
+
+
+class ProductsServicesCatalog(Catalogs):
+    """
+    Opr with Product or Services catalog of Facturama API
+    """
+
+    catalog = 'ProductsOrServices'
+
+
+class PostalCodesCatalog(Catalogs):
+    """
+    Opr with PostalCodes catalog of Facturama API
+    """
+
+    catalog = 'PostalCodes'
+
+
+class UnitsCatalog(Catalogs):
+    """
+    Opr with Units catalog of Facturama API
+    """
+
+    catalog = 'Units'
+
+
+class CurrenciesCatalog(Catalogs):
+    """
+    Opr with Currencies catalog of Facturama API
+    """
+
+    catalog = 'Currencies'
+
+
+class CountriesCatalog(Catalogs):
+    """
+    Opr with Currencies catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'Countries'
+
+
+class PaymentFormsCatalog(Catalogs):
+    """
+    Opr with PaymentForms catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'PaymentForms'
+
+
+class PaymentMethodsCatalog(Catalogs):
+    """
+    Opr with PaymentMethods catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'PaymentMethods'
+
+
+class FederalTaxesCatalog(Catalogs):
+    """
+    Opr with FederalTaxes catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'FederalTaxes'
+
+
+class FiscalRegimensCatalog(Catalogs):
+    """
+    Opr with FiscalRegimens catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'FiscalRegimens'
+
+
+class CfdiTypesCatalog(Catalogs):
+    """
+    Opr with CfdiTypes catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'CfdiTypes'
+
+
+class RelationTypesCatalog(Catalogs):
+    """
+    Opr with RelationTypes catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'RelationTypes'
+
+
+class CfdiUsesCatalog(Catalogs):
+    """
+    Opr with CfdiUses catalog of Facturama API
+    """
+    prefix = 'catalogs'
+    catalog = 'CfdiUses'
