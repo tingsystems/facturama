@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -77,11 +77,12 @@ class Facturama:
         :return:
         """
         # urls base of facturama api
+        host = 'http://apisandbox.facturama.com.mx' if sandbox else 'https://www.api.facturama.com.mx'
         uris = [
-            'https://www.api.facturama.com.mx/api/',
-            'https://www.api.facturama.com.mx/api/2/',
-            'https://www.api.facturama.com.mx/api-lite/',
-            'https://www.api.facturama.com.mx/2/api-lite/',
+            '{}/api/'.format(host),
+            '{}/api/2/'.format(host),
+            '{}/api-lite/'.format(host),
+            '{}/2/api-lite/'.format(host),
         ]
         api_base = uris[version]
         cls.aut_api()
