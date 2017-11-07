@@ -237,19 +237,19 @@ class csds(Facturama):
     """
 
     @classmethod
-    def get_by_rfc(cls, rfc):
+    def get_by_rfc(cls, rfc, v=0):
         """
         get csds by rfc
         :return: object with data from response
         """
-        return cls.to_object(cls.build_http_request('get', '{}/{}'.format(cls.__name__, rfc)))
+        return cls.to_object(cls.build_http_request('get', '{}/{}'.format(cls.__name__, rfc), version=v))
 
     @classmethod
     def create(cls, data):
         raise NotImplemented('Method not implemented')
 
     @classmethod
-    def upload(cls, rfc, path_key, path_cer, password, encode=False):
+    def upload(cls, rfc, path_key, path_cer, password, encode=False, v=0):
         """
 
         :param encode:
@@ -257,6 +257,7 @@ class csds(Facturama):
         :param path_key:
         :param path_cer:
         :param password:
+        :param v:
         :return: object with data from response
         """
         file_key, file_cer = path_key, path_cer
@@ -270,7 +271,7 @@ class csds(Facturama):
         data = {
             'Rfc': str(rfc).upper(), 'Certificate': file_cer, 'PrivateKey': file_key, 'PrivateKeyPassword': password
         }
-        return cls.build_http_request('post', cls.__name__, data)
+        return cls.build_http_request('post', cls.__name__, data, version=v)
 
 
 class Catalogs(Facturama):
