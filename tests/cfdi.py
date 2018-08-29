@@ -5,7 +5,7 @@ from . import BaseEndpointTestCase
 
 class CfdiEndpointTestCase(BaseEndpointTestCase):
 
-    def test_cfdi_create(self):
+    def test_cfdi_get_file(self):
         self.client._credentials = ('pruebas', 'pruebas2011')
         html_file = self.client.Cfdi.get_by_file('html', 'IssuedLite', '3Dy9HrTLw2RF_R2H15kELQ2')
         self.client.api_lite = True

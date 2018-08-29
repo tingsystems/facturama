@@ -164,12 +164,13 @@ class Facturama:
         return cls.to_object(cls.build_http_request('put', '{}/{}'.format(cls.__name__, oid), data))
 
     @classmethod
-    def delete(cls, oid):
+    def delete(cls, oid, v=1):
         """
+        :param v:
         :param oid: id object
         :return: None
         """
-        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid))
+        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid), version=v)
 
 
 class Client(Facturama):
