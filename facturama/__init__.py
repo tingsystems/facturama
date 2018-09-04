@@ -87,10 +87,13 @@ class Facturama:
         api_base = uris[version]
         cls.aut_api()
         method = str(method).lower()
+        try:
+            body = request(
+                method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
+            )
+        except Exception:
+            raise ApiError({'error': 'Service not available'})
 
-        body = request(
-            method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
-        )
         if body.status_code == 200 or body.status_code == 201 or body.status_code == 204:
             response_body = {'status': True}
             try:
