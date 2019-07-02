@@ -224,8 +224,9 @@ class Cfdi(Facturama):
         return cls.build_http_request('post', '{}?cfdiType={}&cfdiId={}&email={}'.format(cls.__name__, t, oid, email))
 
     @classmethod
-    def delete(cls, oid):
+    def delete(cls, oid, v=1):
         """
+        :param v: version api
         :param oid: id object
         :return: None
         """
@@ -251,6 +252,18 @@ class csds(Facturama):
     @classmethod
     def create(cls, data):
         raise NotImplemented('Method not implemented')
+
+    @classmethod
+    def delete(cls, oid, v=1):
+        """
+        :param v: version api
+        :param oid: id object
+        :return: None
+        """
+        v = 2 if api_lite else 0
+        return cls.build_http_request(
+            'delete', '{}/{}'.format(cls.__name__, oid), version=v
+        )
 
     @classmethod
     def upload(cls, rfc, path_key, path_cer, password, encode=False, v=0):
