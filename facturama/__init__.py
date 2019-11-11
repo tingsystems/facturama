@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '2.0.4'
+__version__ = '2.0.3'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -77,7 +77,7 @@ class Facturama:
         :return:
         """
         # urls base of facturama api
-        host = 'http://apisandbox.facturama.com.mx' if sandbox else 'https://www.api.facturama.com.mx'
+        host = 'https://apisandbox.facturama.mx' if sandbox else 'https://api.facturama.mx'
         uris = [
             '{}/api/'.format(host),
             '{}/api/2/'.format(host),
@@ -87,13 +87,9 @@ class Facturama:
         api_base = uris[version]
         cls.aut_api()
         method = str(method).lower()
-        try:
-            body = request(
-                method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
-            )
-        except Exception:
-            raise ApiError({'error': 'Service not available'})
-
+        body = request(
+            method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
+        )
         if body.status_code == 200 or body.status_code == 201 or body.status_code == 204:
             response_body = {'status': True}
             try:
@@ -139,7 +135,7 @@ class Facturama:
         :params oid: id of object retrieve
         :return: object with data from response
         """
-        return cls.to_object(cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid), params=params))
+        return cls.to_object(cls.build_http_request('get', '{}/{}'.format(cls.__name__, oid), params=params, version=0))
 
     @classmethod
     def all(cls, params=None):
@@ -167,13 +163,12 @@ class Facturama:
         return cls.to_object(cls.build_http_request('put', '{}/{}'.format(cls.__name__, oid), data))
 
     @classmethod
-    def delete(cls, oid, v=1):
+    def delete(cls, oid):
         """
-        :param v:
         :param oid: id object
         :return: None
         """
-        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid), version=v)
+        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid))
 
 
 class Client(Facturama):
@@ -210,6 +205,15 @@ class Cfdi(Facturama):
         return cls.to_object(cls.build_http_request('post', cls.__name__ if not api_lite else 'cfdis', data, version=v))
 
     @classmethod
+    def retrieve(cls, oid, params=None):
+        """
+        :param params:
+        :param oid: id object
+        :return: None
+        """
+        return cls.to_object(cls.build_http_request('get', '{}/{}'.format('cfdis', oid), version=2))
+
+    @classmethod
     def get_by_file(cls, f, t, oid):
         """
         :return: get cfdi file by format and type
@@ -224,9 +228,8 @@ class Cfdi(Facturama):
         return cls.build_http_request('post', '{}?cfdiType={}&cfdiId={}&email={}'.format(cls.__name__, t, oid, email))
 
     @classmethod
-    def delete(cls, oid, v=1):
+    def delete(cls, oid):
         """
-        :param v: version api
         :param oid: id object
         :return: None
         """
@@ -252,18 +255,6 @@ class csds(Facturama):
     @classmethod
     def create(cls, data):
         raise NotImplemented('Method not implemented')
-
-    @classmethod
-    def delete(cls, oid, v=1):
-        """
-        :param v: version api
-        :param oid: id object
-        :return: None
-        """
-        v = 2 if api_lite else 0
-        return cls.build_http_request(
-            'delete', '{}/{}'.format(cls.__name__, oid), version=v
-        )
 
     @classmethod
     def upload(cls, rfc, path_key, path_cer, password, encode=False, v=0):

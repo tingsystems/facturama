@@ -6,7 +6,7 @@ class CSDSEndpointTestCase(BaseEndpointTestCase):
         self.client._credentials = ('user', 'pass')
         self.client.api_lite = True
         self.client.sandbox = False
-        # self.client.csds.delete('IME0703019F7')
+        # self.client.csds.delete('rfc')
         self.client.csds.upload('rfc', 'csds.key', 'csds.cer', 'pass', v=2)
         csds = self.client.csds.get_by_rfc('rfc', v=2)
         assert csds.status
