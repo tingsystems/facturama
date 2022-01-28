@@ -163,12 +163,12 @@ class Facturama:
         return cls.to_object(cls.build_http_request('put', '{}/{}'.format(cls.__name__, oid), data))
 
     @classmethod
-    def delete(cls, oid):
+    def delete(cls, oid, params):
         """
         :param oid: id object
         :return: None
         """
-        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid), params=None)
+        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid), params=params)
 
 
 class Client(Facturama):
@@ -228,14 +228,14 @@ class Cfdi(Facturama):
         return cls.build_http_request('post', '{}?cfdiType={}&cfdiId={}&email={}'.format(cls.__name__, t, oid, email))
 
     @classmethod
-    def delete(cls, oid):
+    def delete(cls, oid, params=None):
         """
         :param oid: id object
         :return: None
         """
         v = 2 if api_lite else 0
         return cls.build_http_request(
-            'delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid), version=v
+            'delete', '{}/{}'.format(cls.__name__ if not api_lite else 'cfdis', oid), params=params, version=v
         )
 
 
