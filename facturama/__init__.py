@@ -10,7 +10,7 @@ try:
 except ImportError:
     import simplejson as json
 
-__version__ = '2.0.3'
+__version__ = '2.0.4'
 __author__ = 'Raul Granados'
 
 api_lite = False
@@ -168,7 +168,7 @@ class Facturama:
         :param oid: id object
         :return: None
         """
-        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid))
+        return cls.build_http_request('delete', '{}/{}'.format(cls.__name__, oid), params=None)
 
 
 class Client(Facturama):
