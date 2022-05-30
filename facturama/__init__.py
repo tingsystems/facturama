@@ -83,6 +83,7 @@ class Facturama:
             '{}/api/2/'.format(host),
             '{}/api-lite/'.format(host),
             '{}/api-lite/2/'.format(host),
+            '{}/api-lite/3/'.format(host)
         ]
         api_base = uris[version]
         cls.aut_api()
