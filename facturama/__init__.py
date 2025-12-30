@@ -88,31 +88,51 @@ class Facturama:
         api_base = uris[version]
         cls.aut_api()
         method = str(method).lower()
-        body = request(
-            method, '{}{}'.format(api_base, path), data=json.dumps(payload), params=params, headers=cls._headers
-        )
-        if body.status_code == 200 or body.status_code == 201 or body.status_code == 204:
-            response_body = {'status': True}
+
+        kwargs = {
+            "params": params,
+            "headers": cls._headers
+        }
+
+        if method in ("post", "put", "patch"):
+            kwargs["data"] = json.dumps(payload)
+
+        body = request(method, '{}{}'.format(api_base, path), **kwargs)
+
+        content_type = body.headers.get('Content-Type', '').lower()
+
+        if 'application/json' in content_type:
             try:
                 response_body = body.json()
             except Exception:
-                pass
+                response_body = body.text
+        else:
+            response_body = body.text
+
+        if body.status_code in (200, 201, 204):
             return response_body
 
+        error_payload = {
+            "status_code": body.status_code,
+            "reason": body.reason,
+            "url": body.url,
+            "response": response_body,
+        }
+
         if body.status_code == 400:
-            raise MalformedRequestError(body.json())
+            raise MalformedRequestError(error_payload)
         elif body.status_code == 401:
-            raise AuthenticationError(body.json())
+            raise AuthenticationError(error_payload)
         elif body.status_code == 402:
-            raise ProcessingError(body.json())
+            raise ProcessingError(error_payload)
         elif body.status_code == 404:
-            raise ResourceNotFoundError(body.json())
+            raise ResourceNotFoundError(error_payload)
         elif body.status_code == 422:
-            raise ParameterValidationError(body.json())
+            raise ParameterValidationError(error_payload)
         elif body.status_code == 500:
-            raise ApiError(body.json())
+            raise ApiError(error_payload)
         else:
-            raise FacturamaError(body.json())
+            raise FacturamaError(error_payload)
 
     @classmethod
     def to_object(cls, response):
